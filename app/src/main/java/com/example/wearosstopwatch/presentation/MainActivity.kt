@@ -31,7 +31,12 @@ import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
+import androidx.wear.compose.material.TimeText
+import androidx.wear.compose.material.TimeTextDefaults
+import androidx.wear.compose.material.Vignette
+import androidx.wear.compose.material.VignettePosition
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,45 +45,58 @@ class MainActivity : ComponentActivity() {
             val viewModel = viewModel<StopWatchViewModel>()
             val timerState by viewModel.timerState.collectAsStateWithLifecycle() // Keeps Flow from being collected if app is in the background
             val stopWatchText by viewModel.stopWatchText.collectAsStateWithLifecycle()
-            StopWatch(
-                state = timerState,
-                text = stopWatchText,
-                onToggleRunning = viewModel::toggleIsRunning,
-                onReset = viewModel::resetTimer,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
-            )
+            Scaffold(
+                timeText = {
+                    TimeText(
+                        timeTextStyle = TimeTextDefaults.timeTextStyle(
+                            fontSize = 20.sp
+                        )
+                    )
+                },
+                vignette = {
+                    Vignette(vignettePosition = VignettePosition.TopAndBottom)
+                }
+            ) {
+                StopWatch(
+                    state = timerState,
+                    text = stopWatchText,
+                    onToggleRunning = viewModel::toggleIsRunning,
+                    onReset = viewModel::resetTimer,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun StopWatch (
+private fun StopWatch(
     state: TimerState,
     text: String,
     onToggleRunning: () -> Unit,
     onReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column (
+    Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text (
+        Text(
             text = text,
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
             Button(onClick = onToggleRunning) {
-                Icon (
+                Icon(
                     imageVector = if (state == TimerState.RUNNING) {
                         Icons.Default.Pause
                     } else {
@@ -94,10 +112,11 @@ private fun StopWatch (
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.surface
                 )
-            ) { 
+            ) {
                 Icon(
-                    imageVector = Icons.Default.Stop, 
-                    contentDescription = null)
+                    imageVector = Icons.Default.Stop,
+                    contentDescription = null
+                )
             }
         }
     }
