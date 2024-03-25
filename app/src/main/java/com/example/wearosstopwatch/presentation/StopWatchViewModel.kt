@@ -67,6 +67,11 @@ class StopWatchViewModel: ViewModel() {
         }
     }
 
+    fun resetTimer() {
+        _timerState.update { TimerState.RESET }
+        _elapsedTime.update { 0L }
+    }
+
     // The purpose of this function is to keep time accurately in case the delay function is off at all
     private fun getTimerFlow(isRunnnig: Boolean): Flow<Long> {
         //Keeps a loop active as long as the timer is running and consistently emit the time differences
