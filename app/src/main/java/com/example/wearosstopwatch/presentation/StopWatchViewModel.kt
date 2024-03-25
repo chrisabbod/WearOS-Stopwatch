@@ -41,6 +41,23 @@ class StopWatchViewModel: ViewModel() {
             "00:00:00:000"
         )
 
+    init {
+        // This flow is dependant on _timerState
+        // Ex. if our state changes from PAUSE to RUNNING then getTimerFlow will run as intended
+        // But if our app is Paused then we will return an empty Flow because we will not enter the while loop
+        _timerState
+            .flatMapLatest { timerState ->
+                getTimerFlow(
+                    isRunnnig = timerState == TimerState.RUNNING
+                )
+            } // From this point we are getting emissions (timeDiff) from getTimerFlow of type Flow<Long>
+            .onEach { timeDiff ->
+                // _elapsedTime triggers by calling update which automatically triggers an emission of our stopWatchText
+                _elapsedTime.update { it + timeDiff } // Every 10 ms add our previous 10 ms and keep total
+            }
+            .launchIn(viewModelScope) // Run this code in ViewModelScope
+    }
+
     // The purpose of this function is to keep time accurately in case the delay function is off at all
     private fun getTimerFlow(isRunnnig: Boolean): Flow<Long> {
         //Keeps a loop active as long as the timer is running and consistently emit the time differences
