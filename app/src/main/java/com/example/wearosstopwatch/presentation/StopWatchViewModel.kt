@@ -4,6 +4,7 @@ package com.example.wearosstopwatch.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.wear.compose.material.TimeText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -56,6 +57,14 @@ class StopWatchViewModel: ViewModel() {
                 _elapsedTime.update { it + timeDiff } // Every 10 ms add our previous 10 ms and keep total
             }
             .launchIn(viewModelScope) // Run this code in ViewModelScope
+    }
+
+    fun toggleIsRunning() {
+        when (timerState.value) {
+            TimerState.RUNNING -> _timerState.update { TimerState.PAUSED }
+            TimerState.PAUSED, // Fallthrough
+            TimerState.RESET -> _timerState.update { TimerState.RUNNING }
+        }
     }
 
     // The purpose of this function is to keep time accurately in case the delay function is off at all
