@@ -4,7 +4,6 @@ package com.example.wearosstopwatch.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.wear.compose.material.TimeText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -49,7 +48,7 @@ class StopWatchViewModel: ViewModel() {
         _timerState
             .flatMapLatest { timerState ->
                 getTimerFlow(
-                    isRunnnig = timerState == TimerState.RUNNING
+                    isRunning = timerState == TimerState.RUNNING
                 )
             } // From this point we are getting emissions (timeDiff) from getTimerFlow of type Flow<Long>
             .onEach { timeDiff ->
@@ -73,11 +72,11 @@ class StopWatchViewModel: ViewModel() {
     }
 
     // The purpose of this function is to keep time accurately in case the delay function is off at all
-    private fun getTimerFlow(isRunnnig: Boolean): Flow<Long> {
+    private fun getTimerFlow(isRunning: Boolean): Flow<Long> {
         //Keeps a loop active as long as the timer is running and consistently emit the time differences
         return flow {
             var startMillis = System.currentTimeMillis() // Save the current time in milliseconds
-            while (isRunnnig) {
+            while (isRunning) {
                 val currentMillis = System.currentTimeMillis()
                 val timeDiff = if (currentMillis > startMillis) {
                     // Calculate the time difference between the current time and the started time
